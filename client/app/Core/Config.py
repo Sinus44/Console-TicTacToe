@@ -1,5 +1,5 @@
 class Config(dict):
-	config = None
+	"""Класс для обработки конфигурационных файлов *.cfg с возможностью чтения, записи, автосохранения"""
 
 	def __init__(self, path, autosave=False):
 		super().__init__()
@@ -12,7 +12,8 @@ class Config(dict):
 		else:
 			self[key] = value
 
-		if self.autosave: self.write()
+		if self.autosave:
+			self.write()
 
 	def setParam(self, section, key, value):
 		if value == "":
@@ -61,11 +62,3 @@ class Config(dict):
 
 		file.write(out)
 		file.close()
-
-
-#cfg = Config("./config.ini", autosave=True) # Init
-#cfg.read() # REad
-#print(cfg["key"])
-#cfg.set("f",{"Ahaha":"Kэк"}) # Set
-#cfg.set("f", "") # delete
-#cfg.write() # Write

@@ -1,6 +1,8 @@
 # Import ----------------------------------------
 from src.properties import *
 from Core.core import *	
+from src.Client import *
+from src.GameClient import * 
 
 # Screen ----------------------------------------
 screen = Window(int(cfg["MAIN"]["W"]), int(cfg["MAIN"]["H"]))
@@ -26,7 +28,11 @@ def createB_click(obj):
         }
     }
 
-    #Logging.log(request)
+    response = Client.send(request)
+
+    if response["status"] == "ok":
+        GameClient.init(response["args"]["game_id"], response["args"]["secret_code"], response["args"]["symbol"], response["args"]["step"])
+        Scene.set("Waiting")
 
 ## Password Checkbox Change
 def privateGameCb_Change(obj):
@@ -57,12 +63,12 @@ passwordTb = Textbox(screen, style, 0, 0, "Password", False, 16, Input.numbers)
 elementG.append(passwordTb)
 
 ### Create Button
-createB = Button(screen, style, 0, 0, "[ CREATE ]")
+createB = Button(screen, style, 0, 0, "CREATE")
 createB.click = createB_click
 elementG.append(createB)
 
 ### Back Button
-backB = Button(screen, style, 0, 0, "[ BACK ]")
+backB = Button(screen, style, 0, 0, "BACK")
 backB.click = backB_click
 elementG.append(backB)
 

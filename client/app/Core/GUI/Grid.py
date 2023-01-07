@@ -1,6 +1,8 @@
 from Core.core import Mmath
 
 class Grid:
+    """Визуальный (графический) разделитель окна в соответсвии с кол-вом столбцов и строк"""
+
     def __init__(self, screen, x, y, w, h, columns, strings, style):
         self.screen = screen
         self.w = w
@@ -12,7 +14,7 @@ class Grid:
         self.style = style
 
         self.cellW = Mmath.round((w - (columns - 1)) / columns)
-        self.cellH =  Mmath.round((h - (strings - 1)) / strings)
+        self.cellH = Mmath.round((h - (strings - 1)) / strings)
     
     def intersection(self, x, y):
         x1 = x // self.cellW

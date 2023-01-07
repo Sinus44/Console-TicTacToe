@@ -1,13 +1,8 @@
 # Import ----------------------------------------
 from src.properties import *
 from Core.core import *
-
-# Screen ----------------------------------------
-screen = Window(int(cfg["MAIN"]["W"]), int(cfg["MAIN"]["H"]))
-
-# Import style ----------------------------------
-style = Style()
-style.importFromConfig(cfg)
+from src.Client import *
+from src.GameClient import *
 
 # GUI Callback ----------------------------------
 ## GameID Textbox Select
@@ -37,13 +32,23 @@ def connectB_click(obj):
         }
     }
 
-    #Logging.log(request)
+    response = Client.send(request)
+    if response["status"] == "ok":
+        GameClient.init(gameIdTb.value, response["args"]["secret_code"], response["args"]["symbol"],  response["args"]["step"])
+        Scene.set("Game")
 
 ## Back Button
 def backB_click(obj):
     Scene.set(Scene.prev)
 
 # GUI -------------------------------------------
+## Screen
+screen = Window(int(cfg["MAIN"]["W"]), int(cfg["MAIN"]["H"]))
+
+## Style
+style = Style()
+style.importFromConfig(cfg)
+
 ## Frame
 frame = Frame(screen, style)
 
@@ -69,12 +74,12 @@ passwordTb.select = passwordTb_select
 elementG.append(passwordTb)
 
 ### Connect Button
-connectB = Button(screen, style, 0, 0, "[ CONNECT ]")
+connectB = Button(screen, style, 0, 0, "CONNECT")
 connectB.click = connectB_click
 elementG.append(connectB)
 
 ### Back Button
-backB = Button(screen, style, 0, 0, "[ BACK ]")
+backB = Button(screen, style, 0, 0, "BACK")
 backB.click = backB_click
 elementG.append(backB)
 

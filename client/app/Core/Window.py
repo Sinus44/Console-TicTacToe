@@ -11,12 +11,10 @@ class Window:
 	def draw(self):
 		"""Вывод буффера в консоль"""
 		s = ""
-
 		for i in range(self.h - 1):
 			s += "".join(self.buffer[i])
 
 		s += "".join(self.buffer[self.h - 1])
-		
 		ctypes.windll.kernel32.WriteConsoleW(ctypes.windll.kernel32.GetStdHandle(-11), s, len(s))
 
 	def clear(self, fast=True):

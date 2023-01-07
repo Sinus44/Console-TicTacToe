@@ -1,6 +1,8 @@
 from Core.GUI.Style import Style
 
 class Border:
+    """Рамка для окна"""
+    
     def __init__(self, screen, style):
         self.screen = screen
         self.style = style

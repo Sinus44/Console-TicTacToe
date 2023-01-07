@@ -1,6 +1,7 @@
 import datetime
 
 class Logging:
+	"""Класс вывода отладочной информации / записи логов в файл"""
 	def log(*text):
 		date = datetime.datetime.now()
 		file = open(f"{date.day}{date.month}{date.year}.log", "a")

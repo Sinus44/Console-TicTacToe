@@ -1,4 +1,6 @@
 class Color:
+	"""Класс цветов"""
+	
 	BLACK	 = '\33[30m'
 	RED	     = '\33[31m'
 	GREEN	 = '\33[32m'

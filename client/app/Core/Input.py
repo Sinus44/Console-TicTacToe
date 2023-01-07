@@ -1,10 +1,65 @@
 import ctypes
-import ctypes.wintypes
-
+from ctypes.wintypes import *
 from Core.Logging import Logging
-from Core.Performance import Performance
+
+# CTYPES ADAPTATE -------------------------------
+
+#KEYBOARD
+class CHAR_UNION(ctypes.Union):
+    _fields_ = [("UnicodeChar", WCHAR),
+                ("AsciiChar", CHAR)]
+
+class KEY_EVENT_RECORD(ctypes.Structure):
+    _fields_ = [("bKeyDown", BYTE),
+                ("pad2", BYTE),
+                ('pad1', SHORT),
+                ("wRepeatCount", SHORT),
+                ("wVirtualKeyCode", SHORT),
+                ("wVirtualScanCode", SHORT),
+                ("uChar", CHAR_UNION),
+                ("dwControlKeyState", INT)]
+
+#MOUSE
+class MOUSE_EVENT_RECORD(ctypes.Structure):
+    _fields_ = [("dwMousePosition", ctypes.wintypes._COORD),
+                ("dwButtonState", INT),
+                ("dwControlKeyState", INT),
+                ("dwEventFlags", INT)]
+
+#WINDOW BUFFER SIZE
+class WINDOW_BUFFER_SIZE_RECORD(ctypes.Structure):
+    _fields_ = [("dwSize", ctypes.wintypes._COORD)]
+
+#MENU
+class MENU_EVENT_RECORD(ctypes.Structure):
+    _fields_ = [("dwCommandId", UINT)]
+
+#FOCUS
+class FOCUS_EVENT_RECORD(ctypes.Structure):
+    _fields_ = [("bSetFocus", BYTE)]
+
+#UNION
+class INPUT_UNION(ctypes.Union):
+    _fields_ = [("KeyEvent", KEY_EVENT_RECORD),
+                ("MouseEvent", MOUSE_EVENT_RECORD),
+                ("WindowBufferSizeEvent", WINDOW_BUFFER_SIZE_RECORD),
+                ("MenuEvent", MENU_EVENT_RECORD),
+                ("FocusEvent", FOCUS_EVENT_RECORD)]
+
+#RECORD
+class INPUT_RECORD(ctypes.Structure):
+    _fields_ = [("EventType", SHORT),
+                ("Event", INPUT_UNION)]
+
+#RECORDS ARRAY
+class INPUT_RECORD_ARRAY(ctypes.Structure):
+	_fields_ = [("Records", INPUT_RECORD * 64)]
+
+# -----------------------------------------------
 
 class Input:
+	"""Класс для получения входных ивентов консоли"""
+
 	EVENTS = []
 
 	spec = " _+=-!@#$%^&*()<>.,~`|/\{}[];:'"
@@ -16,11 +71,13 @@ class Input:
 	ruCaps = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ"
 	ru = ruCaps.lower()
 
+	listning = True
+
 	class Types:
 		Keyboard = 1
 		Mouse = 2
 		Window = 4
-		Menu = 8 # ?? ?/ ?? ?? /?? WHAT  />> .>>????????/??/???
+		Menu = 8
 		Focus = 16
 
 	class Mouse:
@@ -31,7 +88,7 @@ class Input:
 		WHEELV = 4
 		WHEELH = 8
 
-		#Mouse key
+		#Mouse key:
 		NULL = 0
 		LEFT = 1
 		RIGHT = 2
@@ -105,11 +162,16 @@ class Input:
 		def __str__(self):
 			return f"Type: {self.type}\nmouseType: {self.mouseType}\nMouseKey: {self.mouseKey}\nMouseX: {self.mouseX}\nMouseY: {self.mouseY}\nKeyboardCode: {self.keyboardCode}\nKeyboardChar: {self.keyboardChar}\nKeyboardState: {self.keyboardState}\n"
 
-
 	def init():
 		Input.handle = ctypes.windll.kernel32.GetStdHandle(-10)
 		Input.events = ctypes.wintypes.DWORD()
-		Input.InputRecord = ctypes.wintypes.INPUT_RECORD()
+		Input.InputRecord = INPUT_RECORD()
+
+	def start():
+		Input.listning = True
+
+	def stop():
+		Input.listning = False
 
 	def mode(useHotkey=False, lineInput=False, echo=False, resizeEvents=False, mouseEvents=False, insert=False, quickEdit=False, extended=False):
 		out = 0x0
@@ -126,10 +188,14 @@ class Input:
 		ctypes.windll.kernel32.SetConsoleMode(Input.handle, out)
 
 	def tick():
+		if not Input.listning: return
+
 		ctypes.windll.kernel32.ReadConsoleInputW(Input.handle, ctypes.byref(Input.InputRecord), 1, ctypes.byref(Input.events))
 
-		eventType = Input.InputRecord.EventType
-		event = Input.InputRecord.Event
+		record = Input.InputRecord
+
+		event = record.Event
+		eventType = record.EventType
 
 		mouseX = event.MouseEvent.dwMousePosition.X # X
 		mouseY = event.MouseEvent.dwMousePosition.Y # Y
@@ -140,12 +206,18 @@ class Input:
 		keyboardChar = event.KeyEvent.uChar.UnicodeChar # Символ клавиши
 		keyboardState = event.KeyEvent.bKeyDown # Состояние кнопки
 
-		Input.EVENTS.append(Input.Event(type=eventType, mouseType=mouseType, mouseKey=mouseKey, mouseX=mouseX, mouseY=mouseY, keyboardCode=keyboardCode, keyboardChar=keyboardChar, keyboardState=keyboardState))
+		event = Input.Event(type=eventType, mouseType=mouseType, mouseKey=mouseKey, mouseX=mouseX, mouseY=mouseY, keyboardCode=keyboardCode, keyboardChar=keyboardChar, keyboardState=keyboardState)
+		Input.EVENTS.append(event)
 
 	def clearEvents():
 		Input.EVENTS = []
 
 	def getEvents(tick=False):
 		if tick: Input.tick()
-		if len(Input.EVENTS):
-			yield Input.EVENTS.pop()
+
+		for event in Input.EVENTS:
+			if len(Input.EVENTS):
+				event = Input.EVENTS.pop()
+				yield event
+			else:
+				return []

@@ -1,6 +1,7 @@
 # Import ----------------------------------------
-from src.properties import *
 from Core.core import *	
+from src.Client import * 
+from src.properties import *
 
 # Screen ----------------------------------------
 screen = Window(int(cfg["MAIN"]["W"]), int(cfg["MAIN"]["H"]))
@@ -40,22 +41,22 @@ titleL = Label(screen, style, 1, screen.h - 2, "Tic Tac Toe by Sinus44 [21.12.20
 elementG = Group(screen, 3, 3)
 
 ### Create Game Button
-createGameB = Button(screen, style, 0, 0, "[ CREATE GAME ]")
+createGameB = Button(screen, style, 0, 0, "CREATE GAME", Client.connected)
 createGameB.click = createGameB_click
 elementG.append(createGameB)
 
 ### Connect Button
-connectB = Button(screen, style, 0, 0, "[ CONNECT ]")
+connectB = Button(screen, style, 0, 0, "CONNECT", Client.connected)
 connectB.click = connectB_click
 elementG.append(connectB)
 
 ### Settings Button
-settingsB = Button(screen, style, 0, 0, "[ SETTINGS ]")
+settingsB = Button(screen, style, 0, 0, "SETTINGS")
 settingsB.click = settingsB_click
 elementG.append(settingsB)
 
 ### Exit Button
-exitB = Button(screen, style, 0, 0, "[ EXIT ]")
+exitB = Button(screen, style, 0, 0, "EXIT")
 exitB.click = exitB_click
 elementG.append(exitB)
 
@@ -70,11 +71,13 @@ class Menu:
 	"""Сцена меню"""
 	def play():
 		for event in Input.getEvents():
+			#Logging.log(event)
 			elementG.eventHandler(event)
 			if event.type == Input.Types.Mouse:
 				if event.mouseType == Input.Mouse.CLICK:
 					if event.mouseKey == Input.Mouse.LEFT:
 						elementG.click()
+						return
 
 		frame.draw()
 		border.draw()

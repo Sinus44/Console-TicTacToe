@@ -2,6 +2,7 @@ import ctypes
 import os
 
 class Output:
+	"""Класс для настройки выходного буффера окна консоли"""
 	handle = None
 
 	def init():
@@ -13,11 +14,7 @@ class Output:
 	def getTitle():
 		out = (ctypes.c_char * 256)()
 		ctypes.windll.kernel32.GetConsoleTitleW(ctypes.byref(out), ctypes.wintypes.DWORD(256))
-		return str(bytes(out), encoding="utf-8")		
-
-	def hideCoursor():
-		pass
-	# SetConsoleCursorInfo что б курсор не показывать
+		return str(bytes(out), encoding="utf-8")
 
 	def title(title="Console Engine by Sinus"):
 		ctypes.windll.kernel32.SetConsoleTitleW(title)

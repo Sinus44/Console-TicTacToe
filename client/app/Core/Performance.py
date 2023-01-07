@@ -2,6 +2,7 @@ import time
 import timeit
 
 class Performance:
+	"""Класс оценки производительности, замеров времени выполнения кода, по точкам или функции"""
 	startTime = 0
 	
 	def start():

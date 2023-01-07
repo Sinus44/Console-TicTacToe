@@ -2,6 +2,7 @@ import threading
 import time
 
 class Interval:
+	"""Класс цикличного вызова функции в соответветсвии с интервалом"""
 	def __init__(self, callback, t=1, daemon=False):
 		self.on = False
 		self.callback = callback

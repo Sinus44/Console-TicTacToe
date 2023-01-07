@@ -3,6 +3,7 @@ import pyaudio
 import threading
 
 class Sound:
+	"""Класс звуков, импорт из файла воспроизведение ускорение замедление, остановка"""
 	def __init__(self, filePath):
 		self.filePath = filePath
 		self.chunksize = 1024

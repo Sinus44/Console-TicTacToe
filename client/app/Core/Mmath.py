@@ -1,4 +1,5 @@
 class Mmath:
+	"""Некоторые математические формулы"""
 	def round(x):
 		return int((x // 1) if x % 1 < 0.5 else ((x // 1) + 1))
 	

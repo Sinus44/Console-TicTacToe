@@ -1,7 +1,7 @@
 from Core.core import Color
-from Core.core import Logging
 
 class Style(dict):
+    """Стиль - настройки цветов и прочего для GUI элементов"""
     def __init__(self):
         super().__init__({
 			"text": Color.BLACK,

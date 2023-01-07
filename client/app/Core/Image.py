@@ -3,6 +3,7 @@ from Core.Mmath import Mmath
 from Core.Color import Color
 
 class Image:
+	"""Импорт картинок пригодных для вставки в Window"""
 	def __init__(self, path, alpha=False):
 		self.file = PIL.Image.open(path)
 		self.img = self.file.load()

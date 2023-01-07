@@ -1,6 +1,6 @@
-from Core.Logging import Logging
-
 class Group:
+    """Группа GUI элементов, авто позиционнирование элементов в соответсвии с интервалом и координатами группы"""
+
     def __init__(self, screen, x, y, interval=1):
         self.screen = screen
         self.x = x

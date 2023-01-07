@@ -1,6 +1,6 @@
-from Core.core import Logging
-
 class Events:
+    """Шаблоны Event'ов для GUI элементов"""
+    
     def click(self, obj):
         pass
 

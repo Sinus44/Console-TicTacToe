@@ -2,6 +2,8 @@ from Core.Input import Input
 from Core.GUI.Element import Element
 
 class Textbox(Element):
+    """GUI элемент для ввода текста пользователем"""
+    
     def __init__(self, screen, style, x, y, text="", enable=True, maxLength=0, alphabet="123457890"):
         super().__init__(screen, style, x, y, text, enable)
         self.value = ""

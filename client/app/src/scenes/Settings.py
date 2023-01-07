@@ -40,7 +40,7 @@ nicknameTb.value = cfg["USER"]["nickname"]
 elementG.append(nicknameTb)
 
 ### Sound Checkbox
-soundCb = Checkbox(screen, style, 0, 0, "Sound", True)
+soundCb = Checkbox(screen, style, 0, 0, "Sound", False)
 soundCb.checked = cfg["MAIN"]["sound"].upper() == "TRUE"
 soundCb.change = soundCb_change
 elementG.append(soundCb)
@@ -51,12 +51,12 @@ resolutionTb.value = f"{cfg['MAIN']['W']}x{cfg['MAIN']['H']}"
 elementG.append(resolutionTb)
 
 ### Save Button
-saveB = Button(screen, style, 0, 0, "[ SAVE ]", True)
+saveB = Button(screen, style, 0, 0, "SAVE", True)
 saveB.click = saveB_click
 elementG.append(saveB)
 
 ### Back Button
-backB = Button(screen, style, 0, 0, "[ BACK ]")
+backB = Button(screen, style, 0, 0, "BACK")
 backB.click = backB_click
 elementG.append(backB)
 

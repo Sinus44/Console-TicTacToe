@@ -1,11 +1,9 @@
 from Core.Input import Input
-from Core.GUI.Style import Style
 from Core.GUI.Events import Events
 
 class Element(Events):
-
-    #def inin(self, screen, style, pos, visible, enable)
-
+    """Мульти класс для большенства GUI элементов"""
+    
     def __init__(self, screen, style, x=0, y=0, text="", enable=True, visible=True):
         self.screen = screen
         self.style = style

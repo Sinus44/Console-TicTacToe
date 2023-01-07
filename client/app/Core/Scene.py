@@ -1,24 +1,9 @@
-from Core.Logging import Logging
-
 class Scene:
+	"""Класс для управления отображаемыми сценами"""
 
 	list = {}
 	selected = ""
 	prev = ""
-
-	"""
-	def set2(scene):
-		if Scene.scene:
-			Scene.prevScene = Scene.scene
-
-			if "stop" in Scene.scene.__dict__:
-				Logging.log(str(Scene.scene.stop))
-				Scene.scene.stop()
-
-		Scene.scene = scene
-		if "init" in Scene.scene.__dict__:
-			Scene.scene.init()
-	"""
 
 	def set(name):
 		"""Установка сцены по имени"""
@@ -36,5 +21,4 @@ class Scene:
 
 	def play():
 		"""Воспроизведение сцены"""
-		#Scene.scene.play()
 		Scene.list[Scene.selected].play()

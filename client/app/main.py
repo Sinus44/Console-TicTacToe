@@ -1,14 +1,45 @@
-from Core.core import *
-from src.properties import *
-from src.scenes.scenes import *
+# -----------------------------------------------------------
+# (C) 2022 Sinus44, Kostroma, Russia
+# Released under MIT LICENSE
+# Email sekrets808@gmail.com
+# ----------------------------------------------------------
 
-# Output configurate
+# Imports ---------------------------------------
+from Core.core import *
+from src.Client import *
+from src.properties import *
+
+# Debug Configurate -----------------------
+fpsCounter = cfg["DEBUG"]["fpscheck"].upper() == "TRUE"
+networkRequest = cfg["DEBUG"]["networkrequest"].upper() == "TRUE"
+
+# Client - Server Configurate -------------------
+if networkRequest:
+	Client.debugFunc = Logging.log
+Client.init(cfg["SERVER"]["ip"], int(cfg["SERVER"]["port"]))
+Client.connect()
+
+# Проверка версии на соответсвие (запросы в разных версиях могут отличаться)
+request = {
+	"command": "check_version",
+	"args": {
+		"client_version": int(cfg["OTHER"]["version"])
+	}
+}
+
+response = Client.send(request)
+
+if not(response is None) and response["status"] != "ok":
+	Logging.log(f"Bad server version. Update client. Required version: {response['args']['required_version']}")
+	Client.close()
+
+# Output Configurate ----------------------------
 Output.init()
-Output.title("Tic Tac Toe")
+Output.title("Masya - Tic Tac Toe")
 Output.resize(cfg["MAIN"]["W"], cfg["MAIN"]["H"])
 Output.mode(5)
 
-# Imput configurate
+# Imput Configurate -----------------------------
 Input.init()
 Input.mode(
 	useHotkey = True,
@@ -17,12 +48,15 @@ Input.mode(
 	extended = True
 )
 
-# Scenes configurate
+# Scene import ----------------------------------
+from src.scenes.scenes import *
+
+# Scenes configurate ----------------------------
 scenes = {
 	"Connect": Connect,
 	"Create": Create,
 	"Game": Game,
-	"Loading": Loading,
+	"Waiting": Waiting,
 	"Menu": Menu,
 	"Settings": Settings
 }
@@ -30,10 +64,11 @@ scenes = {
 Scene.addFromDict(scenes)
 Scene.set("Menu")
 
-func = lambda: (Input.tick() is None) & (Scene.play() is None)
+# Iteration -------------------------------------
+func = lambda: (Scene.play() is None) & (Input.tick() is None)
 
-fpsCounter = cfg["TESTING"]["fpscheck"].upper() == "TRUE"
 
+# Loop ------------------------------------------
 if fpsCounter:
 	while True:
 		time = Performance.function(func)[0]
@@ -41,6 +76,3 @@ if fpsCounter:
 else:
 	while True:
 		func()
-
-# 0 < Логгинг < 800 (fps)
-# 50K < Инпут < 500K (fps)

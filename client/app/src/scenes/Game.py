@@ -32,7 +32,7 @@ zero = Window(grid.cellW - 1, grid.cellH - 1)
 zero.fill()
 centerX = zero.w // 2
 centerY = zero.h // 2
-rad = min(centerX, centerY)
+rad = min(centerX, centerY) - 1
 zero.circle(centerX, centerY, rad)
 
 # Scene

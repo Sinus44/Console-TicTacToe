@@ -26,18 +26,22 @@ class Server:
 	def dataListner(self, conn):
 		"""Слушатель команд для каждого юзера"""
 		while True:
-			data = conn.recv(self.maxData).decode("UTF-8")
+			try:
+				data = conn.recv(self.maxData).decode("UTF-8")
 
-			if not data:
-				self.error(conn, "data empty")
-				conn.close()
-				return
+				if not data:
+					self.error(conn, "data empty")
+					conn.close()
+					return
 
-			d = json.loads(data)
-			callbackRes = self.handlerClass.__dict__[d["command"]](d["args"])
-			callbackResJSON = json.dumps(callbackRes)
+				d = json.loads(data)
+				callbackRes = self.handlerClass.__dict__[d["command"]](d["args"])
+				callbackResJSON = json.dumps(callbackRes)
+				
+				self.send(conn, callbackResJSON)
 			
-			self.send(conn, callbackResJSON)
+			except:
+				self.debug("Произошла неизвестная ошибка или пользователь отключился")
 
 	def start(self):
 		"""Начало работы сервера, прослушивание входящих соединений, команд"""
@@ -47,6 +51,7 @@ class Server:
 
 		while self.listning:
 			conn, addr = self.socket.accept()
+			self.debug(f"Подключен новый пользовательm IP:{addr}")
 
 			connect = threading.Thread(target=self.dataListner, args=[conn])
 			connect.start()
@@ -54,11 +59,15 @@ class Server:
 	
 	def error(self, connection, text):
 		"""Отправка ошибки клиенту"""
+		self.debug(text)
 		self.send(connection, '{"status":"bad", "args": {"error":"' + str(text) + '"}')
 	
 	def send(self, connection, text):
 		"""Отправка данных клиенту"""
 		connection.sendall(bytes(text, "UTF-8"))
+
+	def debug(text):
+		pass
 
 games = []
 
@@ -135,6 +144,9 @@ class Game:
 		return user
 
 class ServerHandler:
+	def debug(text):
+		pass
+
 	def create_game(args):
 		"""Создание игры"""
 
@@ -335,10 +347,17 @@ port = int(cfg["MAIN"]["port"])
 maxConnections = int(cfg["MAIN"]["maxconnections"])
 version = int(cfg["MAIN"]["version"])
 
-Output.title(f"Tic Tac Toe Server v{version}")
-Logging.print(f"Запуск сервера v{version}...")
+Output.title(f"Tic Tac Toe Server")
+Logging.print(f"Запуск сервера...", end="")
+
+Logging.print(f"Версия протокола: {version}", end="")
 
 serv = Server(ServerHandler, port, maxConnections)
 serv.addr = serv.getLocalIp()
-Logging.print("Сервер запущен")
-serv.start()
+serv.debug = Logging.print
+
+Logging.print("Сервер запущен", end="")
+try:
+	serv.start()
+except:
+	Logging.print("Ошибка запуска")

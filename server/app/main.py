@@ -4,10 +4,12 @@ import threading
 import random
 import time
 
+from Engine import *
+
 version = 1
 
 class Server:
-	def __init__(self, handlerClass, port=30120, addr="127.0.0.1", maxConnections=20):
+	def __init__(self, handlerClass, port, addr="127.0.0.1", maxConnections=20):
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.maxConnections = maxConnections
 		self.handlerClass = handlerClass
@@ -145,6 +147,7 @@ class ServerHandler:
 
 		symbol = random.choice(["X","0"])
 		user = games[gameid].addUser(args["nickname"], symbol)
+		print(f"{args['nickname']} создал игру ID: {gameid}")
 
 		return {
 			"status": "ok",
@@ -286,7 +289,6 @@ class ServerHandler:
 				}
 			}
 
-
 		while games[int(args["game_id"])].step != user.symbol:
 			pass
 
@@ -326,6 +328,17 @@ class ServerHandler:
 	#	else:
 	#		return None
 
-serv = Server(ServerHandler)
+cfg = Config("config.cfg", False)
+cfg.read()
+
+port = int(cfg["MAIN"]["port"])
+maxConnections = int(cfg["MAIN"]["maxconnections"])
+version = int(cfg["MAIN"]["version"])
+
+Output.title(f"Tic Tac Toe Server v{version}")
+Logging.print(f"Запуск сервера v{version}...")
+
+serv = Server(ServerHandler, port, maxConnections)
 serv.addr = serv.getLocalIp()
+Logging.print("Сервер запущен")
 serv.start()

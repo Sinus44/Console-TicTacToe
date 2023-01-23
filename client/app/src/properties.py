@@ -1,4 +1,4 @@
-from Core.Config import Config
+from Engine import Config
 
 cfg = Config("./src/config.ini")
 cfg.read()

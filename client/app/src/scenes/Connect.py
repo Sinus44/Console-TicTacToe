@@ -1,6 +1,6 @@
 # Import ----------------------------------------
 from src.properties import *
-from Core.core import *
+from Engine import *
 from src.Client import *
 from src.GameClient import *
 
@@ -93,13 +93,13 @@ elementG.sort()
 # Scene -----------------------------------------
 class Connect:
     """Сцена подключения к игре"""
+
     def play():
-        for event in Input.getEvents():
-            elementG.eventHandler(event)
-            if event.type == Input.Types.Mouse:
-                if event.mouseType == Input.Mouse.CLICK:
-                    if event.mouseKey == Input.Mouse.LEFT:
-                        elementG.click()
+        elementG.eventHandler()
+        if Input.eventType == Input.Types.Mouse:
+            if Input.mouseType == Input.Mouse.DOWN and not Input.prevMouseState:
+                if Input.mouseKey == Input.Mouse.LEFT:
+                    elementG.click()
 
         frame.draw()
         border.draw()

@@ -5,7 +5,7 @@
 # ----------------------------------------------------------
 
 # Imports ---------------------------------------
-from Core.core import *
+from Engine import *
 from src.Client import *
 from src.properties import *
 
@@ -14,10 +14,14 @@ fpsCounter = cfg["DEBUG"]["fpscheck"].upper() == "TRUE"
 networkRequest = cfg["DEBUG"]["networkrequest"].upper() == "TRUE"
 
 # Client - Server Configurate -------------------
+Client.init(cfg["SERVER"]["ip"], int(cfg["SERVER"]["port"]))
+Client.timeout(int(cfg["SERVER"]["connecttime"]))
+
 if networkRequest:
 	Client.debugFunc = Logging.log
-Client.init(cfg["SERVER"]["ip"], int(cfg["SERVER"]["port"]))
+	
 Client.connect()
+Client.timeout(int(cfg["SERVER"]["steptime"]))
 
 # Проверка версии на соответсвие (запросы в разных версиях могут отличаться)
 request = {
@@ -34,14 +38,12 @@ if not(response is None) and response["status"] != "ok":
 	Client.close()
 
 # Output Configurate ----------------------------
-Output.init()
+Output.init(5)
 Output.title("Masya - Tic Tac Toe")
 Output.resize(cfg["MAIN"]["W"], cfg["MAIN"]["H"])
-Output.mode(5)
 
 # Imput Configurate -----------------------------
-Input.init()
-Input.mode(
+Input.init(
 	useHotkey = True,
 	mouseEvents = True,
 	resizeEvents = True,
@@ -66,7 +68,6 @@ Scene.set("Menu")
 
 # Iteration -------------------------------------
 func = lambda: (Scene.play() is None) & (Input.tick() is None)
-
 
 # Loop ------------------------------------------
 if fpsCounter:

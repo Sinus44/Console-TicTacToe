@@ -10,6 +10,10 @@ class Client:
 		Client.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		Client.maxData = 1024
 		Client.connected = False
+		Client.timeout(5)
+
+	def timeout(seconds):
+		Client.socket.settimeout(seconds)
 
 	def connect():
 		try:

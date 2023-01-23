@@ -1,6 +1,6 @@
 # Import ----------------------------------------
 from src.properties import *
-from Core.core import *
+from Engine import *
 from src.Client import *
 from src.GameClient import *
 
@@ -50,7 +50,11 @@ class Waiting:
             }
         }
 
-        response = Client.send(request)
+        try:
+            response = Client.send(request)
 
-        if response["status"] == "ok":
-            Scene.set("Game")
+            if response["status"] == "ok":
+                Scene.set("Game")
+        
+        except:
+            Scene.set("Menu")

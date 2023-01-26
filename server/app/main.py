@@ -25,7 +25,8 @@ class Server:
 
 	def dataListner(self, conn):
 		"""Слушатель команд для каждого юзера"""
-		while True:
+		enable = True
+		while enable:
 			try:
 				data = conn.recv(self.maxData).decode("UTF-8")
 
@@ -42,6 +43,7 @@ class Server:
 			
 			except:
 				self.debug("Произошла неизвестная ошибка или пользователь отключился")
+				enable = False
 
 	def start(self):
 		"""Начало работы сервера, прослушивание входящих соединений, команд"""
@@ -92,6 +94,8 @@ class Game:
 		self.users = []
 		self.started = False
 		self.step = "X"
+		self.end = False
+		self.winner = ""
 	
 	def checkWin(self):
 		winCombinations = [
@@ -136,6 +140,17 @@ class Game:
 				[1,0,0]
 			],
 		]
+
+		for user in self.users:
+			userPlane = []
+			for i in range(len(self.plane)):
+				userPlane.append([])
+				for j in range(len(self.plane[i])):
+					userPlane[i].append(1 if self.plane[i][j] == user.symbol else 0)
+
+			if userPlane in winCombinations:
+				self.end = True
+				self.winner = user.nickname
 		
 	def addUser(self, nickname, symbol):
 		"""Добавление нового игрока в список игроков"""
@@ -159,7 +174,7 @@ class ServerHandler:
 
 		symbol = random.choice(["X","0"])
 		user = games[gameid].addUser(args["nickname"], symbol)
-		print(f"{args['nickname']} создал игру ID: {gameid}")
+		Logging.print(f"{args['nickname']} создал игру ID: {gameid}")
 
 		return {
 			"status": "ok",
@@ -265,8 +280,17 @@ class ServerHandler:
 				}
 			}
 
+		if game.end:
+			return {
+				"status":"bad",
+				"args": {
+					"error":"Game End"
+				}
+			}
+
 		game.plane[int(args["x"])][int(args["y"])] = symbol
-		
+		game.checkWin()
+
 		if symbol == "0":
 			game.step = "X"
 
@@ -277,7 +301,9 @@ class ServerHandler:
 			"status": "ok",
 			"args": {
 				"plane": game.plane,
-				"step": game.step
+				"step": game.step,
+				"end": game.end,
+				"winner": game.winner
 			}
 		}
 	
@@ -308,7 +334,9 @@ class ServerHandler:
 			"status": "ok",
 			"args": {
 				"plane": games[int(args["game_id"])].plane,
-				"step": games[int(args["game_id"])].step
+				"step": games[int(args["game_id"])].step,
+				"end": games[int(args["game_id"])].end,
+				"winner": games[int(args["game_id"])].winner
 			}
 		}
 	

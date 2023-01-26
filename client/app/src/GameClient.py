@@ -10,3 +10,5 @@ class GameClient:
 			["","",""],
 			["","",""]
 		]
+        GameClient.end = False
+        GameClient.winner = ""

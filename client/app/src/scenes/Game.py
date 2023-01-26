@@ -42,22 +42,26 @@ class Game:
         if Input.eventType == Input.Types.Mouse:
             if Input.mouseType == Input.Mouse.DOWN and not Input.prevMouseState:
                 if Input.mouseKey == Input.Mouse.LEFT:
-                    if Input.mouseKey == Input.Mouse.LEFT:
-                        coords = grid.intersection(Input.mouseX, Input.mouseY)
-                        request = {
-                            "command":"set_symbol",
-                            "args": {
-                                "game_id": GameClient.gameId,
-                                "secret_code": GameClient.secretCode,
-                                "x": coords[0],
-                                "y": coords[1]
-                            }
+                    coords = grid.intersection(Input.mouseX, Input.mouseY)
+                    request = {
+                        "command":"set_symbol",
+                        "args": {
+                            "game_id": GameClient.gameId,
+                            "secret_code": GameClient.secretCode,
+                            "x": coords[0],
+                            "y": coords[1]
                         }
+                    }
 
-                        response = Client.send(request)
-                        if response["status"] == "ok":
-                            GameClient.plane = response["args"]["plane"]
-                            GameClient.step = response["args"]["step"]
+                    response = Client.send(request)
+                    if response["status"] == "ok":
+                        GameClient.plane = response["args"]["plane"]
+                        GameClient.step = response["args"]["step"]
+                        if response["args"]["end"] == True:
+                            Output.title("Выйграл " + response["args"]["winner"])
+                            Scene.set("Menu")
+                            return
+
 
         frame.draw()
         border.draw()
@@ -87,7 +91,11 @@ class Game:
             Output.title("Ждём ход соперника")
             
             response = Client.send(request)
+
             if response["status"] == "ok":
+                if response["args"]["end"] == True:
+                    Output.title("Выйграл " + response["args"]["winner"])
+                    Scene.set("Menu")
                 GameClient.plane = response["args"]["plane"]
                 GameClient.step = response["args"]["step"]
             Input.reset()

@@ -151,6 +151,16 @@ class Game:
 			if userPlane in winCombinations:
 				self.end = True
 				self.winner = user.nickname
+
+	def checkFree(self):
+		emptyCells = 0
+		for i in range(len(self.plane)):
+				for j in range(len(self.plane[i])):
+					emptyCells += 1 if self.plane[i][j] == "" else 0
+
+		if not emptyCells:
+			self.end = True
+			self.winner = "Ничья"
 		
 	def addUser(self, nickname, symbol):
 		"""Добавление нового игрока в список игроков"""
@@ -255,6 +265,22 @@ class ServerHandler:
 		"""Внесение изменений в игровое поле"""
 
 		game = games[int(args["game_id"])]
+
+		if game.end:
+			return {
+				"status":"bad",
+				"args": {
+					"error":"Game End"
+				}
+			}
+
+		if game.plane[int(args["x"])][int(args["y"])] != "":
+			return {
+				"status": "bad",
+				"args": {
+					"error": "Cell pointed"
+				}
+			}
 		
 		symbol = ""
 
@@ -279,17 +305,10 @@ class ServerHandler:
 					"error":"Not your step"
 				}
 			}
-
-		if game.end:
-			return {
-				"status":"bad",
-				"args": {
-					"error":"Game End"
-				}
-			}
-
+		
 		game.plane[int(args["x"])][int(args["y"])] = symbol
 		game.checkWin()
+		game.checkFree()
 
 		if symbol == "0":
 			game.step = "X"
@@ -357,34 +376,35 @@ class ServerHandler:
 					"version_check": "ok"
 				}
 			}
-	
-	#def getPlayerFromSecretCode(gameid, secretcode):
-	#	if args["secret_code"] == game.users[0].secretCode:
-	#		return game.users[0]
-	#	
-	#	elif args["secret_code"] == game.users[1].secretCode:
-	#		return game.users[1]
-	#	
-	#	else:
-	#		return None
 
+# Config import
 cfg = Config("config.cfg", False)
 cfg.read()
 
+# Var's init
 port = int(cfg["MAIN"]["port"])
 maxConnections = int(cfg["MAIN"]["maxconnections"])
 version = int(cfg["MAIN"]["version"])
+defaultIP = "127.0.0.1"
 
+#
 Output.title(f"Tic Tac Toe Server")
-Logging.print(f"Запуск сервера...", end="")
 
-Logging.print(f"Версия протокола: {version}", end="")
+# Logging
+Logging.print(f"Запуск сервера...")
+Logging.print(f"Версия протокола: {version}")
+Logging.print(f"Сетевой порт: {port}")
+Logging.print(f"Максимум подключений: {maxConnections}")
+Logging.print(f"Стандартный IP: {defaultIP}")
 
-serv = Server(ServerHandler, port, maxConnections)
+# Server creating
+serv = Server(ServerHandler, port, defaultIP, maxConnections)
 serv.addr = serv.getLocalIp()
 serv.debug = Logging.print
 
-Logging.print("Сервер запущен", end="")
+Logging.print("=" * 20)
+Logging.print("Сервер запущен")
+Logging.print(f"Текущий IP: {serv.addr}")
 try:
 	serv.start()
 except:
